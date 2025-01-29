@@ -1,0 +1,22 @@
+<!-- result.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>作業結果ページ</title>
+</head>
+<body>
+    <h1>{{ message }}</h1>
+    <p>音声ファイルURL: <a href="{{ uploaded_audio_url }}" target="_blank">{{ uploaded_audio_url }}</a></p>
+    <p>WordテンプレURL: <a href="{{ uploaded_word_url }}" target="_blank">{{ uploaded_word_url }}</a></p>
+
+    <hr>
+    <p>自動作成されたWordファイル: 
+        <a href="{{ updated_word_url }}" target="_blank">ダウンロードリンク</a>
+    </p>
+    <p>サーバー内部パス: {{ output_file_path }}</p>
+
+    <hr>
+    <p><a href="/">別のファイルをアップロードする</a></p>
+</body>
+</html>

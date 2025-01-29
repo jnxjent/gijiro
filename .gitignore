@@ -1,0 +1,14 @@
+# 環境変数ファイル
+.env
+
+# Pythonキャッシュファイル
+__pycache__/
+*.pyc
+
+# IDEやエディタの設定
+.vscode/
+.idea/
+
+# ログファイル
+*.log
+.env
