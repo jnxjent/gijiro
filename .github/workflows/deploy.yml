@@ -3,7 +3,8 @@ name: Deploy to Azure
 on:
   push:
     branches:
-      - master  # ブランチ名が main の場合は main に変更
+      - master  # または main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -16,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'  # 使用するPythonバージョンに合わせてください
+        python-version: '3.9'
 
     - name: Install dependencies
       run: |
@@ -26,6 +27,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'gijiro'  # Azure Web Appの名前に置き換えてください
+        app-name: 'gijiro'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: .
