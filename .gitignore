@@ -4,6 +4,11 @@
 # Pythonキャッシュファイル
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# 仮想環境
+venv/
 
 # IDEやエディタの設定
 .vscode/
@@ -11,10 +16,3 @@ __pycache__/
 
 # ログファイル
 *.log
-.env
-venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
