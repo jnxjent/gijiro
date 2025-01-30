@@ -12,3 +12,9 @@ __pycache__/
 # ログファイル
 *.log
 .env
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
