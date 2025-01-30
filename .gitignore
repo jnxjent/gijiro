@@ -9,6 +9,7 @@ __pycache__/
 
 # 仮想環境
 venv/
+antenv/
 
 # IDEやエディタの設定
 .vscode/
@@ -16,3 +17,5 @@ venv/
 
 # ログファイル
 *.log
+
+
