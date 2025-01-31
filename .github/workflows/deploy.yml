@@ -3,7 +3,7 @@ name: Deploy to Azure
 on:
   push:
     branches:
-      - master  # ブランチ名が main の場合は main に変更
+      - master  # または main に変更
 
 jobs:
   build-and-deploy:
@@ -13,28 +13,33 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # ここが重要
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'  # Python 3.9 を明示的に指定
-
-    - name: Ensure runtime.txt is present
-      run: |
-        echo "python-3.9.21" > runtime.txt
-        cat runtime.txt  # デバッグのため表示
+        python-version: '3.9'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set Python Version in Azure
+      run: |
+        az webapp config set --resource-group ai2 --name gijiro --linux-fx-version "PYTHON|3.9"
+        az webapp config appsettings set --resource-group ai2 --name gijiro --settings WEBSITES_PYTHON_VERSION=3.9
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'gijiro'  # Azure Web App の名前
+        app-name: 'gijiro'  
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: .
 
-    - name: Restart Web App
+    - name: Restart Azure Web App
       run: |
         az webapp restart --name gijiro --resource-group ai2
