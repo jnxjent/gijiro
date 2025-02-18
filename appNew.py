@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import settings  # ← 環境変数のロード
 import os
 from flask import Flask
 from flask_cors import CORS
@@ -18,3 +19,6 @@ if __name__ == "__main__":
     from os import getenv
     port = int(getenv("PORT", 8000))  # 8000 をデフォルトに設定
     app.run(host="0.0.0.0", port=port, debug=False)
+
+
+
