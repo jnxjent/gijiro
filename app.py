@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import settings  # ← 環境変数のロード
 import os
 from flask import Flask
 from flask_cors import CORS
