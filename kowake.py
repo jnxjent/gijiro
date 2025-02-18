@@ -1,5 +1,3 @@
-# chunk.py
-
 import os
 import openai
 from dotenv import load_dotenv
@@ -9,6 +7,22 @@ from deepgram import Deepgram
 
 # .env ファイルの読み込み
 load_dotenv()
+# .env から FFMPEG_PATH, FFPROBE_PATH を取得（デフォルト値として空文字を指定）
+ffmpeg_path = os.getenv("FFMPEG_PATH", "")
+ffprobe_path = os.getenv("FFPROBE_PATH", "")
+
+# 環境変数にセット
+os.environ["FFMPEG_BINARY"] = ffmpeg_path
+os.environ["FFPROBE_BINARY"] = ffprobe_path
+
+# `pydub` をインポートする前にパスを設定
+from pydub import AudioSegment
+AudioSegment.converter = ffmpeg_path
+AudioSegment.ffprobe = ffprobe_path
+
+# デバッグ用に出力
+print(f"FFMPEG_BINARY: {AudioSegment.converter}")
+print(f"FFPROBE_BINARY: {AudioSegment.ffprobe}")
 
 OPENAI_API_KEY   = os.getenv("OPENAI_API_KEY")
 OPENAI_API_BASE  = os.getenv("OPENAI_API_BASE")
@@ -119,3 +133,4 @@ async def transcribe_and_correct(audio_file_path: str) -> str:
     full_transcription = "\n".join(corrected_chunks)
 
     return full_transcription
+
