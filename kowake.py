@@ -14,7 +14,9 @@ ffprobe_path = os.getenv("FFPROBE_PATH", "")
 # 環境変数にセット
 os.environ["FFMPEG_BINARY"] = ffmpeg_path
 os.environ["FFPROBE_BINARY"] = ffprobe_path
-
+# ここで、システム PATH に ffmpeg-bin のディレクトリを追加する
+# これにより、pydub の subprocess 呼び出し時に ffprobe が確実に見つかります
+os.environ["PATH"] = "/home/site/wwwroot/ffmpeg-bin:" + os.environ.get("PATH", "")
 # `pydub` をインポートする前にパスを設定
 from pydub import AudioSegment
 AudioSegment.converter = ffmpeg_path
