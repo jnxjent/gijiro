@@ -2,7 +2,7 @@ import os
 import openai
 from dotenv import load_dotenv
 
-from pydub import AudioSegment   # 音声分割に使用（pip install pydub）
+
 from deepgram import Deepgram
 
 # .env ファイルの読み込み
