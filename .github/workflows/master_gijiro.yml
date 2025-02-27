@@ -1,7 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
 name: Build and deploy Python app to Azure Web App - gijiro
 
 on:
@@ -64,18 +60,16 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_06F9E216B9C44AEF85CEA2E76377527B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_0AC86D7BB40847A28F0185FA7C8FA21C }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_594650EB6E154E7A9BC55A4A1854DEE5 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_GIJIRO }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_GIJIRO }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_GIJIRO }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'gijiro'
+          app-name: 'gijiro'  # ✅ gijiro2ではなく、gijiroにデプロイ
           slot-name: 'Production'
-          

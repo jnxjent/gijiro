@@ -3,7 +3,7 @@ name: Deploy to Azure
 on:
   push:
     branches:
-      - master  # `main` の場合は変更してください
+      - master  # `main` なら変更する
 
 jobs:
   build-and-deploy:
@@ -31,8 +31,8 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ secrets.AZURE_APP_SERVICE_NAME }}
+        app-name: **gijiro**  # ✅ gijiro2 ではなく gijiro にデプロイ
         package: .
 
     - name: Restart Azure Web App
-      run: az webapp restart --name ${{ secrets.AZURE_APP_SERVICE_NAME }} --resource-group ai2
+      run: az webapp restart --name **gijiro** --resource-group ai2  # ✅ gijiro2 ではなく gijiro
