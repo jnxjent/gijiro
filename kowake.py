@@ -133,6 +133,12 @@ async def transcribe_and_correct(audio_file_path: str) -> str:
     # 4) 全チャンクの補正後テキストを結合し、最終文字起こしとする
     # -------------------------
     full_transcription = "\n".join(corrected_chunks)
+# デバッグ用に full_transcription を出力
+    print("[DEBUG] full_transcription before speaker replacement:")
+    print(full_transcription)
 
     return full_transcription
+#
 
+
+    

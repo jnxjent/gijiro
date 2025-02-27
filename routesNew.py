@@ -1,13 +1,15 @@
+# routes.py
+
 from flask import request, render_template
 from storage import upload_to_blob, download_blob
-from extraction import extract_meeting_info_and_speakers
-from docwriter import process_document
+from processing import process_files
 from pathlib import Path
 from datetime import datetime
 import asyncio
 import logging
 
 def setup_routes(app):
+    # ロガーの設定
     logger = logging.getLogger("routes")
     logging.basicConfig(level=logging.INFO)
 
@@ -15,13 +17,18 @@ def setup_routes(app):
     def upload():
         if request.method == 'POST':
             try:
+                # 1) ファイルの受け取り
                 audio_file = request.files.get('audio_file')
                 word_file = request.files.get('word_file')
 
                 if not audio_file or not word_file:
                     logger.error(f"Files missing. audio_file={audio_file}, word_file={word_file}")
-                    return render_template("error.html", message="音声ファイルと Word ファイルを両方アップロードしてください。"), 400
+                    return render_template(
+                        "error.html",
+                        message="音声ファイルと Word ファイルを両方アップロードしてください。"
+                    ), 400
 
+                # 2) Blob へのアップロード
                 audio_blob_name = f"audio/{audio_file.filename}"
                 word_blob_name  = f"word/{word_file.filename}"
 
@@ -31,10 +38,15 @@ def setup_routes(app):
                 logger.info(f"Uploading word: {word_file.filename}")
                 word_url = upload_to_blob(word_blob_name, word_file.stream)
 
+                # いずれかがアップロード失敗 (URL が None) ならエラー
                 if not audio_url or not word_url:
                     logger.error("Blob URL generation failed.")
-                    return render_template("error.html", message="Blob URL generation failed"), 500
+                    return render_template(
+                        "error.html",
+                        message="Blob URL generation failed"
+                    ), 500
 
+                # 3) Blob からローカルにダウンロード
                 downloads_dir = Path("./downloads")
                 downloads_dir.mkdir(exist_ok=True)
 
@@ -47,6 +59,7 @@ def setup_routes(app):
                 logger.info(f"Downloading word file to {word_local_path}")
                 download_blob(word_blob_name, str(word_local_path))
 
+                # 4) 処理 (音声 → Deepgram, テンプレ Word → 更新)
                 uploads_dir = Path("./uploads")
                 uploads_dir.mkdir(exist_ok=True)
 
@@ -55,38 +68,24 @@ def setup_routes(app):
                 output_file_local = uploads_dir / output_filename
 
                 logger.info(f"Processing files: {audio_local_path}, {word_local_path}")
-
-                extracted_info = asyncio.run(extract_meeting_info_and_speakers(
-                    str(audio_local_path), str(word_local_path)
+                asyncio.run(process_files(
+                    str(audio_local_path),
+                    str(word_local_path),
+                    str(output_file_local)  # 第三引数に「保存先のローカルパス」
                 ))
 
-                if not extracted_info:
-                    logger.error("[ERROR] extracted_info が空です")
-                    return render_template("error.html", message="議事録の情報抽出に失敗しました"), 500
+                logger.info(f"Processing successful. Output file: {output_file_local}")
 
-                try:
-                    process_document(str(word_local_path), str(output_file_local), extracted_info)
+                # 5) 完成ファイルを再アップロード
+                with open(output_file_local, "rb") as f:
+                    final_doc_blob_path = f"processed/{output_filename}"
+                    updated_word_url = upload_to_blob(final_doc_blob_path, f)
 
-                    logger.info("[OK] Wordファイルへの転記が完了")
-                except Exception as e:
-                    logger.error(f"[ERROR] process_document でエラー発生: {e}")
-                    return render_template("error.html", message=f"Wordファイルの更新に失敗しました: {e}"), 500
+                logger.info(f"Updated Word file uploaded to Blob: {updated_word_url}")
 
-                try:
-                    with open(output_file_local, "rb") as f:
-                        final_doc_blob_path = f"processed/{output_filename}"
-                        updated_word_url = upload_to_blob(final_doc_blob_path, f)
-
-                    if not updated_word_url:
-                        logger.error("[ERROR] 処理後の Word ファイルのアップロードに失敗")
-                        return render_template("error.html", message="処理後の Word ファイルのアップロードに失敗しました"), 500
-
-                    logger.info(f"[OK] Updated Word file uploaded to Blob: {updated_word_url}")
-                except Exception as e:
-                    logger.error(f"[ERROR] Word ファイルのアップロード中にエラー発生: {e}")
-                    return render_template("error.html", message=f"処理後の Word ファイルのアップロードに失敗: {e}"), 500
-
-                return render_template("result.html",
+                # 6) 正常完了 → result.html を表示
+                return render_template(
+                    "result.html",
                     message="処理成功！",
                     output_file_path=str(output_file_local).replace("\\", "/"),
                     uploaded_audio_url=audio_url,
@@ -96,6 +95,10 @@ def setup_routes(app):
 
             except Exception as e:
                 logger.error(f"Error during processing: {e}")
-                return render_template("error.html", message=f"Error during processing: {e}"), 500
+                return render_template(
+                    "error.html",
+                    message=f"Error during processing: {e}"
+                ), 500
 
+        # GETリクエスト → index.html (アップロードフォーム)
         return render_template("index.html")

@@ -22,8 +22,7 @@ if __name__ == "__main__":
         print("[OK] 議事録情報＆話者推定が完了")
 
         # ✅ (修正) Wordファイルの更新（テーブルと議事録）
-        process_document(str(word_local_path), str(output_file_local), extracted_info)
-
+        process_document(output_file_path, output_file_path, extracted_info)
 
         print("[OK] Wordファイルの更新が完了")
         print("完了")
